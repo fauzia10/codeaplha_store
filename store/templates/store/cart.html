@@ -1,0 +1,104 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Shopping Cart - Aura Store{% endblock %}
+
+{% block content %}
+<div class="cart-page-container">
+    <h1 class="cart-page-title">Your Shopping Bag</h1>
+
+    <div class="cart-layout" id="cart-content-wrapper">
+        {% if cart %}
+            <!-- Cart Items List -->
+            <div class="cart-items-panel">
+                {% for item in cart %}
+                    {% with product=item.product %}
+                        <div class="cart-item" data-product-id="{{ product.id }}" id="cart-item-{{ product.id }}">
+                            <div class="cart-item-image-col">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="cart-item-image">
+                                {% else %}
+                                    <div class="cart-item-image-placeholder">
+                                        <i class="fas fa-box-open"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="cart-item-details-col">
+                                <h3 class="cart-item-title">
+                                    <a href="{% url 'store:product_detail' product.id %}">{{ product.name }}</a>
+                                </h3>
+                                <span class="cart-item-price">${{ item.price }}</span>
+                            </div>
+
+                            <div class="cart-item-quantity-col">
+                                <div class="cart-qty-control">
+                                    <button class="cart-qty-btn cart-minus-btn" data-product-id="{{ product.id }}">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <input type="number" class="cart-qty-input" data-product-id="{{ product.id }}" value="{{ item.quantity }}" min="1" max="{{ product.stock }}" readonly>
+                                    <button class="cart-qty-btn cart-plus-btn" data-product-id="{{ product.id }}">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="cart-item-subtotal-col">
+                                <span class="cart-item-subtotal" id="subtotal-{{ product.id }}">${{ item.total_price }}</span>
+                            </div>
+
+                            <div class="cart-item-remove-col">
+                                <button class="cart-remove-btn" data-product-id="{{ product.id }}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+
+            <!-- Cart Summary Panel -->
+            <div class="cart-summary-panel">
+                <div class="summary-card">
+                    <h2>Order Summary</h2>
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="cart-summary-subtotal">${{ cart.get_total_price }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span class="free-shipping">FREE</span>
+                    </div>
+                    <div class="summary-divider"></div>
+                    <div class="summary-row total-row">
+                        <span>Total</span>
+                        <span id="cart-summary-total">${{ cart.get_total_price }}</span>
+                    </div>
+                    <button class="btn btn-primary checkout-btn" onclick="alert('Order placed successfully! Thank you for shopping at Aura Store.')">
+                        Proceed to Checkout
+                    </button>
+                    <a href="{% url 'store:product_list' %}" class="continue-shopping">
+                        <i class="fas fa-arrow-left"></i> Continue Shopping
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <!-- Empty Cart -->
+            <div class="empty-cart-view" id="empty-cart-message">
+                <i class="fas fa-shopping-bag empty-icon"></i>
+                <h2>Your shopping bag is empty</h2>
+                <p>Add some high-quality workspace gear to elevate your day-to-day work.</p>
+                <a href="{% url 'store:product_list' %}" class="btn btn-primary">Go to Shop</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Hidden empty cart view placeholder to swap with JS if cart empty -->
+    <div class="empty-cart-view" id="empty-cart-placeholder" style="display: none;">
+        <i class="fas fa-shopping-bag empty-icon"></i>
+        <h2>Your shopping bag is empty</h2>
+        <p>Add some high-quality workspace gear to elevate your day-to-day work.</p>
+        <a href="{% url 'store:product_list' %}" class="btn btn-primary">Go to Shop</a>
+    </div>
+</div>
+{% endblock %}

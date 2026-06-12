@@ -1,0 +1,80 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Shop - Aura Store{% endblock %}
+
+{% block content %}
+<div class="shop-container">
+    <!-- Hero Banner -->
+    <header class="shop-hero">
+        <div class="hero-content">
+            <h1>Elevate Your Workspace</h1>
+            <p>Discover minimal, functional, and highly polished essentials designed for digital professionals.</p>
+        </div>
+    </header>
+
+    <!-- Products Section -->
+    <section class="products-section">
+        {% if query %}
+            <div class="search-results-info">
+                <p>Showing search results for: <strong>"{{ query }}"</strong></p>
+                <a href="{% url 'store:product_list' %}" class="clear-search-btn">Clear Search</a>
+            </div>
+        {% endif %}
+
+        {% if products %}
+            <div class="product-grid">
+                {% for product in products %}
+                    <article class="product-card">
+                        <div class="product-image-container">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                            {% else %}
+                                <div class="product-image-placeholder">
+                                    <i class="fas fa-box-open"></i>
+                                </div>
+                            {% endif %}
+                            <div class="product-card-overlay">
+                                <a href="{% url 'store:product_detail' product.id %}" class="btn btn-secondary">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">
+                                <a href="{% url 'store:product_detail' product.id %}">{{ product.name }}</a>
+                            </h3>
+                            <div class="product-meta">
+                                <span class="product-price">${{ product.price }}</span>
+                                {% if product.stock > 0 %}
+                                    <span class="stock-badge in-stock">In Stock</span>
+                                {% else %}
+                                    <span class="stock-badge out-of-stock">Out of Stock</span>
+                                {% endif %}
+                            </div>
+                            <div class="product-actions">
+                                {% if product.stock > 0 %}
+                                    <button class="btn btn-primary add-to-cart-btn" data-product-id="{{ product.id }}">
+                                        <i class="fas fa-cart-plus"></i> Add to Cart
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-primary" disabled>
+                                        Sold Out
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-products">
+                <i class="fas fa-search-minus"></i>
+                <h3>No products found</h3>
+                <p>Try searching for something else or browse all products.</p>
+                <a href="{% url 'store:product_list' %}" class="btn btn-primary">Browse All Products</a>
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
