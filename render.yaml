@@ -19,6 +19,6 @@ services:
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
-        value: ".render.com"
+        value: "localhost,127.0.0.1,.onrender.com"
       - key: MONGO_URI
         sync: false
