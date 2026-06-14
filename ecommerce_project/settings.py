@@ -125,3 +125,11 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 AUTH_USER_MODEL = 'store.User'
+
+# ── MongoDB Auth ───────────────────────────────
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+
+# Flash message storage
+from django.contrib.messages import constants as messages_constants
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'

@@ -1,16 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Utility function to display beautiful floating notifications (Toasts)
     function showToast(message) {
-        // Check if toast container already exists, otherwise create it
-        let toast = document.querySelector('.cart-toast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.className = 'cart-toast';
-            toast.innerHTML = `<i class="fas fa-check-circle"></i> <span class="toast-text"></span>`;
-            document.body.appendChild(toast);
-        }
-        
-        toast.querySelector('.toast-text').textContent = message;
+        // Use existing toast from base.html (id="cart-toast" / id="toast-message")
+        const toast = document.getElementById('cart-toast');
+        const msgSpan = document.getElementById('toast-message');
+        if (!toast || !msgSpan) return;
+
+        msgSpan.textContent = message;
         toast.classList.add('show');
         
         setTimeout(() => {
@@ -132,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update item subtotal
                 const itemSubtotal = document.getElementById(`subtotal-${productId}`);
                 if (itemSubtotal) {
-                    itemSubtotal.textContent = `$${data.item_total_price.toFixed(2)}`;
+                    itemSubtotal.textContent = `\u20B9${Math.round(data.item_total_price)}`;
                 }
                 
                 // Update Navbar count & Summary panels
@@ -209,8 +205,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const summarySubtotal = document.getElementById('cart-summary-subtotal');
         const summaryTotal = document.getElementById('cart-summary-total');
         if (summarySubtotal && summaryTotal) {
-            summarySubtotal.textContent = `$${totalCost.toFixed(2)}`;
-            summaryTotal.textContent = `$${totalCost.toFixed(2)}`;
+            summarySubtotal.textContent = `\u20B9${Math.round(totalCost)}`;
+            summaryTotal.textContent = `\u20B9${Math.round(totalCost)}`;
         }
     }
 });

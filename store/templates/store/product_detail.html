@@ -1,103 +1,159 @@
 {% extends 'store/base.html' %}
 {% load static %}
 
-{% block title %}{{ product.name }} - Aura Store{% endblock %}
+{% block title %}{{ product.name }} – Aura Store{% endblock %}
 
 {% block content %}
 <div class="detail-container">
-    <!-- Breadcrumbs -->
-    <nav class="breadcrumbs">
-        <a href="{% url 'store:product_list' %}"><i class="fas fa-chevron-left"></i> Back to Shop</a>
-    </nav>
 
-    <div class="product-detail-grid">
-        <!-- Product Image -->
-        <div class="detail-image-panel">
-            {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="detail-image">
-            {% else %}
-                <div class="detail-image-placeholder">
-                    <i class="fas fa-box-open"></i>
-                </div>
-            {% endif %}
+  <!-- Breadcrumb -->
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="{% url 'store:product_list' %}">
+      <i class="fas fa-chevron-left"></i> Back to Shop
+    </a>
+  </nav>
+
+  <!-- Product Grid -->
+  <div class="product-detail-grid">
+
+    <!-- Left: Image -->
+    <div class="detail-image-panel">
+      {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="detail-image">
+      {% else %}
+        <div class="detail-image-placeholder">
+          <i class="fas fa-box-open"></i>
         </div>
-
-        <!-- Product Ordering Details -->
-        <div class="detail-info-panel">
-            <h1 class="detail-title">{{ product.name }}</h1>
-            <div class="detail-price-row">
-                <span class="detail-price">${{ product.price }}</span>
-                {% if product.stock > 0 %}
-                    {% if product.stock <= 5 %}
-                        <span class="stock-alert low-stock">Only {{ product.stock }} left in stock!</span>
-                    {% else %}
-                        <span class="stock-alert in-stock">In Stock ({{ product.stock }} available)</span>
-                    {% endif %}
-                {% else %}
-                    <span class="stock-alert out-of-stock">Sold Out</span>
-                {% endif %}
-            </div>
-
-            <div class="detail-divider"></div>
-
-            <div class="detail-description">
-                <h3>Description</h3>
-                <p>{{ product.description|linebreaks }}</p>
-            </div>
-
-            <div class="detail-divider"></div>
-
-            <!-- Product Action form -->
-            {% if product.stock > 0 %}
-                <div class="detail-actions">
-                    <div class="quantity-selector">
-                        <label for="quantity">Quantity</label>
-                        <div class="qty-control">
-                            <button type="button" class="qty-btn" id="qty-minus"><i class="fas fa-minus"></i></button>
-                            <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}" readonly>
-                            <button type="button" class="qty-btn" id="qty-plus"><i class="fas fa-plus"></i></button>
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-primary add-to-cart-btn-large" id="add-to-cart-detail" data-product-id="{{ product.id }}">
-                        <i class="fas fa-cart-plus"></i> Add to Cart
-                    </button>
-                </div>
-            {% else %}
-                <div class="detail-actions">
-                    <button class="btn btn-primary btn-large" disabled>
-                        Out of Stock
-                    </button>
-                </div>
-            {% endif %}
-        </div>
+      {% endif %}
     </div>
+
+    <!-- Right: Info -->
+    <div class="detail-info-panel">
+
+      <!-- Category pill -->
+      <span class="detail-category-pill">{{ product.category }}</span>
+
+      <h1 class="detail-title">{{ product.name }}</h1>
+
+      <!-- Price + Stock -->
+      <div class="detail-price-row">
+        <span class="detail-price">&#8377;{{ product.price|floatformat:0 }}</span>
+        {% if product.stock > 0 %}
+          {% if product.stock <= 5 %}
+            <span class="stock-alert low-stock">
+              <i class="fas fa-fire"></i> Only {{ product.stock }} left!
+            </span>
+          {% else %}
+            <span class="stock-alert in-stock">
+              <i class="fas fa-circle-check"></i> In Stock
+            </span>
+          {% endif %}
+        {% else %}
+          <span class="stock-alert out-of-stock">
+            <i class="fas fa-circle-xmark"></i> Sold Out
+          </span>
+        {% endif %}
+      </div>
+
+      <div class="detail-divider"></div>
+
+      <!-- Description -->
+      <div class="detail-description">
+        <h3>Description</h3>
+        <p>{{ product.description|linebreaks }}</p>
+      </div>
+
+      <div class="detail-divider"></div>
+
+      <!-- Actions -->
+      {% if product.stock > 0 %}
+      <div class="detail-actions">
+        <div class="quantity-selector">
+          <label for="quantity">Qty</label>
+          <div class="qty-control">
+            <button type="button" class="qty-btn" id="qty-minus" aria-label="Decrease quantity">
+              <i class="fas fa-minus"></i>
+            </button>
+            <input type="number" id="quantity" name="quantity"
+                   value="1" min="1" max="{{ product.stock }}" readonly
+                   aria-label="Product quantity">
+            <button type="button" class="qty-btn" id="qty-plus" aria-label="Increase quantity">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary add-to-cart-btn-large"
+                id="add-to-cart-detail"
+                data-product-id="{{ product.id }}">
+          <i class="fas fa-cart-plus"></i> Add to Cart
+        </button>
+      </div>
+      {% else %}
+      <div class="detail-actions">
+        <button class="btn btn-primary btn-large" disabled style="width:100%;">
+          <i class="fas fa-ban"></i> Out of Stock
+        </button>
+      </div>
+      {% endif %}
+
+    </div><!-- /.detail-info-panel -->
+  </div><!-- /.product-detail-grid -->
+
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const qtyInput = document.getElementById('quantity');
-        const minusBtn = document.getElementById('qty-minus');
-        const plusBtn = document.getElementById('qty-plus');
-        const maxStock = parseInt(qtyInput ? qtyInput.getAttribute('max') : 0);
+  document.addEventListener('DOMContentLoaded', function () {
+    const qtyInput = document.getElementById('quantity');
+    const minusBtn = document.getElementById('qty-minus');
+    const plusBtn  = document.getElementById('qty-plus');
+    if (!qtyInput) return;
 
-        if (qtyInput) {
-            minusBtn.addEventListener('click', function() {
-                let currentVal = parseInt(qtyInput.value);
-                if (currentVal > 1) {
-                    qtyInput.value = currentVal - 1;
-                }
-            });
+    const maxStock = parseInt(qtyInput.getAttribute('max'), 10);
 
-            plusBtn.addEventListener('click', function() {
-                let currentVal = parseInt(qtyInput.value);
-                if (currentVal < maxStock) {
-                    qtyInput.value = currentVal + 1;
-                }
-            });
-        }
+    minusBtn.addEventListener('click', function () {
+      const v = parseInt(qtyInput.value, 10);
+      if (v > 1) qtyInput.value = v - 1;
     });
+
+    plusBtn.addEventListener('click', function () {
+      const v = parseInt(qtyInput.value, 10);
+      if (v < maxStock) qtyInput.value = v + 1;
+    });
+
+    // Patch cart.js: send qty from detail page
+    const addBtn = document.getElementById('add-to-cart-detail');
+    if (addBtn) {
+      addBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const productId = addBtn.dataset.productId;
+        const qty = parseInt(qtyInput.value, 10);
+        fetch(`/cart/add/${productId}/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+          body: JSON.stringify({ quantity: qty, override: false })
+        })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            const badge = document.getElementById('cart-count');
+            if (badge) badge.textContent = data.cart_total_count;
+            showToast(data.message || 'Added to cart!');
+          }
+        });
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('cart-toast');
+      const text  = document.getElementById('toast-message');
+      if (!toast) return;
+      text.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+  });
 </script>
 {% endblock %}

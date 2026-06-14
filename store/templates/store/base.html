@@ -2,97 +2,662 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Aura Store - Modern E-Commerce{% endblock %}</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'store/css/style.css' %}">
-    {% block extra_css %}{% endblock %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Aura Store – curated tech, aesthetics and minimalist lifestyle goods for digital professionals.">
+  <title>{% block title %}Aura Store{% endblock %}</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Core CSS -->
+  <link rel="stylesheet" href="{% static 'store/css/style.css' %}?v=1.8">
+  {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="{% url 'store:product_list' %}" class="logo">
-                <span class="logo-accent">Aura</span>Store
-            </a>
-            
-            <!-- Search Bar -->
-            <form action="{% url 'store:product_list' %}" method="GET" class="search-form">
-                <div class="search-input-group">
-                    <input type="text" name="q" placeholder="Search products..." value="{{ query|default:'' }}">
-                    <button type="submit"><i class="fas fa-search"></i></button>
+
+  <!-- ── Intro Splash Screen ─────────────────────────────────── -->
+  <div class="intro-splash" id="intro-splash">
+    <div class="splash-panel-top"></div>
+    <div class="splash-panel-bottom"></div>
+    <div class="splash-effects" id="splash-effects"></div>
+    <div class="splash-logo" id="splash-logo">
+      <span class="logo-part-1">Aura</span><span class="logo-part-2">Store</span>
+    </div>
+  </div>
+
+  <!-- ── Navbar ──────────────────────────────────────────────── -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+
+      <!-- Logo -->
+      <a href="{% url 'store:product_list' %}" class="logo" aria-label="Aura Store Home">
+        <span class="logo-accent">Aura</span>Store
+      </a>
+
+      <!-- Search -->
+      <form action="{% url 'store:product_list' %}" method="GET" class="search-form" role="search">
+        <div class="search-input-group">
+          <input type="text" name="q" placeholder="Search products…"
+                 value="{{ query|default:'' }}" aria-label="Search products">
+          <button type="submit" aria-label="Submit search">
+            <i class="fas fa-magnifying-glass"></i>
+          </button>
+        </div>
+      </form>
+
+      <!-- Actions -->
+      <!-- Actions -->
+      <div class="nav-actions">
+        <a href="{% url 'store:cart_detail' %}" class="cart-btn" id="cart-badge-btn" aria-label="View cart">
+          <i class="fas fa-bag-shopping"></i>
+          <span class="cart-badge" id="cart-count">{{ cart_total_count }}</span>
+        </a>
+
+        <button class="cart-btn auth-toggle-btn {% if request.session.mongo_user_id %}logged-in{% endif %}" id="nav-auth-toggle" aria-label="Toggle user panel" style="cursor: pointer; outline: none; {% if request.session.mongo_user_id %}border-color: rgba(0, 180, 216, 0.4);{% endif %}">
+          {% if request.session.mongo_user_id %}
+            <i class="fas fa-circle-user" style="color: var(--accent);"></i>
+          {% else %}
+            <i class="fas fa-user"></i>
+          {% endif %}
+        </button>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- ── Main Content ─────────────────────────────────────────── -->
+  <main class="main-content" id="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ── Footer ──────────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <h3><span class="logo-accent">Aura</span>Store</h3>
+        <p>Curated tech, aesthetics and minimalist lifestyle goods — crafted for digital professionals who demand quality.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="{% url 'store:product_list' %}"><i class="fas fa-store"></i> Shop All</a></li>
+          <li><a href="{% url 'store:cart_detail' %}"><i class="fas fa-bag-shopping"></i> Your Cart</a></li>
+          {% if not request.session.mongo_user_id %}
+          <li><a href="{% url 'store:login' %}"><i class="fas fa-right-to-bracket"></i> Login</a></li>
+          <li><a href="{% url 'store:register' %}"><i class="fas fa-user-plus"></i> Register</a></li>
+          {% endif %}
+        </ul>
+      </div>
+      <div class="footer-social">
+        <h4>Follow Us</h4>
+        <div class="social-icons">
+          <a href="#" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 AuraStore &mdash; All rights reserved. Built beautifully with Django.</p>
+    </div>
+  </footer>
+
+  <!-- ── Toast Notification ───────────────────────────────────── -->
+  <div class="cart-toast" id="cart-toast" role="alert" aria-live="polite">
+    <i class="fas fa-circle-check"></i>
+    <span id="toast-message"></span>
+  </div>
+
+  <!-- ── Auth Drawer Overlay ────────────────────────────────────── -->
+  <div class="auth-drawer-overlay" id="auth-drawer-overlay"></div>
+
+  <!-- ── Auth Drawer ────────────────────────────────────────────── -->
+  <div class="auth-drawer" id="auth-drawer" role="dialog" aria-modal="true" aria-label="Account Panel">
+    <div class="drawer-header">
+      <h3 id="drawer-title">Account</h3>
+      <button class="drawer-close-btn" id="drawer-close" aria-label="Close panel">
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="drawer-content">
+      {% if request.session.mongo_user_id %}
+        <!-- Logged In State -->
+        <div class="drawer-user-info">
+          <div class="drawer-user-avatar">
+            <i class="fas fa-user-circle"></i>
+          </div>
+          <h4 class="drawer-username">{{ request.session.mongo_username }}</h4>
+          <p class="drawer-user-email">{{ request.session.mongo_email }}</p>
+          <div class="drawer-user-badge">
+            <i class="fas fa-leaf"></i> MongoDB Atlas Connected
+          </div>
+        </div>
+
+        <div class="drawer-menu">
+          <a href="{% url 'store:profile' %}" class="btn btn-secondary drawer-menu-btn">
+            <i class="fas fa-circle-user"></i> View Profile
+          </a>
+          <a href="{% url 'store:logout' %}" class="btn btn-secondary logout-btn drawer-menu-btn" style="color: var(--danger); border-color: rgba(248,113,113,0.25);">
+            <i class="fas fa-arrow-right-from-bracket"></i> Sign Out
+          </a>
+        </div>
+      {% else %}
+        <!-- Logged Out State (Tabs: Sign In / Create Account) -->
+        <div class="drawer-tabs">
+          <button class="drawer-tab-btn active" data-tab="tab-signin">Sign In</button>
+          <button class="drawer-tab-btn" data-tab="tab-signup">Register</button>
+        </div>
+
+        <!-- Sign In Form -->
+        <div class="drawer-tab-pane active" id="tab-signin">
+          <form method="POST" action="{% url 'store:login' %}" class="auth-form" id="drawer-login-form" novalidate>
+            {% csrf_token %}
+            <div class="field-group">
+              <label for="drawer_login_username">Username</label>
+              <div class="input-wrap">
+                <i class="fas fa-at field-icon"></i>
+                <input type="text" id="drawer_login_username" name="username" placeholder="Your username" required>
+              </div>
+            </div>
+            <div class="field-group">
+              <label for="drawer_login_password">Password</label>
+              <div class="input-wrap">
+                <i class="fas fa-key field-icon"></i>
+                <input type="password" id="drawer_login_password" name="password" placeholder="Your password" required>
+                <span class="toggle-pw" onclick="togglePw('drawer_login_password', this)">
+                  <i class="fas fa-eye"></i>
+                </span>
+              </div>
+            </div>
+            <button type="submit" class="auth-submit">
+              <i class="fas fa-right-to-bracket"></i> Sign In
+            </button>
+          </form>
+          <div class="mongo-badge">
+            <i class="fas fa-leaf mongo-leaf"></i> Secured with MongoDB Atlas
+          </div>
+        </div>
+
+        <!-- Register Form -->
+        <div class="drawer-tab-pane" id="tab-signup">
+          <form method="POST" action="{% url 'store:register' %}" class="auth-form" id="drawer-register-form" novalidate>
+            {% csrf_token %}
+            <div class="field-group">
+              <label for="drawer_reg_username">Username</label>
+              <div class="input-wrap">
+                <i class="fas fa-at field-icon"></i>
+                <input type="text" id="drawer_reg_username" name="username" placeholder="Pick a username" required>
+              </div>
+            </div>
+            <div class="field-group">
+              <label for="drawer_reg_email">Email Address</label>
+              <div class="input-wrap">
+                <i class="fas fa-envelope field-icon"></i>
+                <input type="email" id="drawer_reg_email" name="email" placeholder="you@example.com" required>
+              </div>
+            </div>
+            <div class="field-group">
+              <label for="drawer_reg_password">Password</label>
+              <div class="input-wrap">
+                <i class="fas fa-lock field-icon"></i>
+                <input type="password" id="drawer_reg_password" name="password" placeholder="Min 6 chars" required oninput="updateDrawerStrength(this.value)">
+                <span class="toggle-pw" onclick="togglePw('drawer_reg_password', this)">
+                  <i class="fas fa-eye"></i>
+                </span>
+              </div>
+              <div class="strength-wrap" id="drawer-strength-wrap">
+                <div class="strength-bar">
+                  <div class="strength-fill" id="drawer-strength-fill"></div>
                 </div>
-            </form>
-
-            <div class="nav-actions">
-                <a href="{% url 'store:cart_detail' %}" class="cart-btn" id="cart-badge-btn">
-                    <i class="fas fa-shopping-bag"></i>
-                    <span class="cart-badge" id="cart-count">{{ cart_total_count }}</span>
-                </a>
+                <div class="strength-label" id="drawer-strength-label"></div>
+              </div>
             </div>
+            <div class="field-group">
+              <label for="drawer_reg_confirm">Confirm Password</label>
+              <div class="input-wrap">
+                <i class="fas fa-shield-halved field-icon"></i>
+                <input type="password" id="drawer_reg_confirm" name="confirm_password" placeholder="Repeat password" required>
+                <span class="toggle-pw" onclick="togglePw('drawer_reg_confirm', this)">
+                  <i class="fas fa-eye"></i>
+                </span>
+              </div>
+            </div>
+            <button type="submit" class="auth-submit">
+              <i class="fas fa-user-plus"></i> Create Account
+            </button>
+          </form>
+          <div class="mongo-badge">
+            <i class="fas fa-leaf mongo-leaf"></i> Powered by MongoDB Atlas
+          </div>
         </div>
-    </nav>
+      {% endif %}
+    </div>
+  </div>
 
-    <!-- Main Content Area -->
-    <main class="main-content">
-        {% block content %}{% endblock %}
-    </main>
+  <!-- ── Support Bot Widget ──────────────────────────────────────── -->
+  <div class="support-bot-container">
+    <button class="support-fab" id="support-fab" aria-label="Toggle support assistant">
+      <i class="fas fa-comments"></i>
+      <span class="support-unread-badge">1</span>
+    </button>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-brand">
-                <h3><span class="logo-accent">Aura</span>Store</h3>
-                <p>Curated tech, aesthetics, and minimalist lifestyle goods.</p>
-            </div>
-            <div class="footer-links">
-                <h4>Explore</h4>
-                <ul>
-                    <li><a href="{% url 'store:product_list' %}">Shop All</a></li>
-                    <li><a href="{% url 'store:cart_detail' %}">View Cart</a></li>
-                </ul>
-            </div>
-            <div class="footer-social">
-                <h4>Follow Us</h4>
-                <div class="social-icons">
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-github"></i></a>
-                </div>
-            </div>
+    <div class="support-chat-window" id="support-chat-window" role="dialog" aria-label="Aura Support Chat">
+      <div class="support-chat-header">
+        <div class="bot-profile">
+          <div class="bot-avatar">
+            <i class="fas fa-robot"></i>
+            <span class="online-indicator"></span>
+          </div>
+          <div class="bot-name-wrap">
+            <span class="bot-name">Aura Assistant</span>
+            <span class="bot-status">Online • Instant Answers</span>
+          </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Aura Store. Built beautifully using Django.</p>
-        </div>
-    </footer>
+        <button class="support-close-btn" id="support-close" aria-label="Close chat">
+          <i class="fas fa-xmark"></i>
+        </button>
+      </div>
 
-    <!-- Cart Actions JS -->
-    <script>
-        // Set up global CSRF token for AJAX requests
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
+      <div class="support-chat-messages" id="support-chat-messages">
+        <!-- Messages will be injected here via JS -->
+      </div>
+
+      <form class="support-chat-input-area" id="support-chat-form">
+        <input type="text" id="support-chat-input" placeholder="Type a message..." aria-label="Type message to support assistant" autocomplete="off">
+        <button type="submit" aria-label="Send message">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Scripts ──────────────────────────────────────────────── -->
+  <script>
+    // CSRF helper
+    function getCookie(name) {
+      const m = document.cookie.match(new RegExp('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)'));
+      return m ? decodeURIComponent(m[2]) : null;
+    }
+    const csrftoken = getCookie('csrftoken');
+  </script>
+  <script src="{% static 'store/js/cart.js' %}"></script>
+  
+  <script>
+    // ── Splash Screen & Logo click animations
+    document.addEventListener('DOMContentLoaded', () => {
+      const splash = document.getElementById('intro-splash');
+      const splashLogo = document.getElementById('splash-logo');
+      const effects = document.getElementById('splash-effects');
+      if (splash) {
+        // Detect if we should play the splash screen loader:
+        // A. Is sessionStorage flag 'playSplash' true?
+        // B. Is performance navigation type 'reload' (refresh)?
+        // C. Is it the very first load of the session (sessionStorage 'splashSeen' is not set)?
+        const playSplashFlag = sessionStorage.getItem('playSplash') === 'true';
+        const isReload = performance.getEntriesByType('navigation')[0]?.type === 'reload';
+        const isFirstLoad = !sessionStorage.getItem('splashSeen');
+        
+        const shouldPlay = playSplashFlag || isReload || isFirstLoad;
+        
+        // Mark splash as seen for future direct link navigations
+        sessionStorage.setItem('splashSeen', 'true');
+        // Reset the playSplash flag
+        sessionStorage.setItem('playSplash', 'false');
+
+        if (shouldPlay) {
+          // Generate floating water bubbles
+          if (effects) {
+            for (let i = 0; i < 15; i++) {
+              const bubble = document.createElement('div');
+              bubble.className = 'bubble';
+              const size = Math.random() * 18 + 6;
+              bubble.style.width = size + 'px';
+              bubble.style.height = size + 'px';
+              bubble.style.left = Math.random() * 100 + '%';
+              bubble.style.animationDelay = Math.random() * 0.5 + 's';
+              bubble.style.animationDuration = Math.random() * 1.5 + 1.5 + 's';
+              effects.appendChild(bubble);
             }
-            return cookieValue;
+          }
+
+          // At 400ms, trigger collision/spacing pulse + water bobbing + water waves
+          setTimeout(() => {
+            if (splashLogo) {
+              splashLogo.classList.add('pulse');
+              splashLogo.classList.add('bobbing');
+            }
+            // Spawn staggered expanding water ripples
+            for (let i = 0; i < 3; i++) {
+              setTimeout(() => {
+                if (effects) {
+                  const ripple = document.createElement('div');
+                  ripple.className = 'ripple';
+                  effects.appendChild(ripple);
+                  setTimeout(() => { ripple.remove(); }, 1000);
+                }
+              }, i * 150);
+            }
+          }, 400);
+
+          // At 700ms, trigger split curtain slide away
+          setTimeout(() => {
+            splash.classList.add('fade-out');
+          }, 700);
+
+          // At 1000ms (1.0s), animate page content and remove overlay
+          setTimeout(() => {
+            const mainContent = document.getElementById('main-content');
+            const footer = document.querySelector('.footer');
+            if (mainContent) mainContent.classList.add('page-entrance');
+            if (footer) footer.classList.add('page-entrance');
+            splash.remove();
+          }, 1000);
+        } else {
+          // Hide splash instantly
+          splash.remove();
+          const mainContent = document.getElementById('main-content');
+          const footer = document.querySelector('.footer');
+          if (mainContent) mainContent.classList.add('page-entrance');
+          if (footer) footer.classList.add('page-entrance');
         }
-        const csrftoken = getCookie('csrftoken');
-    </script>
-    <script src="{% static 'store/js/cart.js' %}"></script>
-    {% block extra_js %}{% endblock %}
+      } else {
+        // Fallback if splash element is missing
+        const mainContent = document.getElementById('main-content');
+        const footer = document.querySelector('.footer');
+        if (mainContent) mainContent.classList.add('page-entrance');
+        if (footer) footer.classList.add('page-entrance');
+      }
+
+      const logo = document.querySelector('.logo');
+      if (logo) {
+        logo.addEventListener('click', (e) => {
+          e.preventDefault();
+          logo.classList.add('logo-melt');
+          
+          // Request splash animation on the landing homepage
+          sessionStorage.setItem('playSplash', 'true');
+          
+          // Generate ripples centered in the logo
+          const ripplesContainer = document.createElement('div');
+          ripplesContainer.className = 'nav-logo-ripples';
+          logo.appendChild(ripplesContainer);
+          
+          for (let i = 0; i < 3; i++) {
+            setTimeout(() => {
+              const ripple = document.createElement('div');
+              ripple.className = 'nav-ripple';
+              ripplesContainer.appendChild(ripple);
+              setTimeout(() => { ripple.remove(); }, 800);
+            }, i * 150);
+          }
+
+          // Navigate after transition completes
+          setTimeout(() => {
+            window.location.href = logo.href;
+          }, 550);
+        });
+      }
+
+      // ── Auth Drawer toggling and tabs
+      const authToggle = document.getElementById('nav-auth-toggle');
+      const authDrawer = document.getElementById('auth-drawer');
+      const authOverlay = document.getElementById('auth-drawer-overlay');
+      const drawerClose = document.getElementById('drawer-close');
+
+      if (authToggle && authDrawer && authOverlay) {
+        const openDrawer = () => {
+          authDrawer.classList.add('active');
+          authOverlay.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        };
+
+        const closeDrawer = () => {
+          authDrawer.classList.remove('active');
+          authOverlay.classList.remove('active');
+          document.body.style.overflow = '';
+        };
+
+        authToggle.addEventListener('click', openDrawer);
+        if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+        authOverlay.addEventListener('click', closeDrawer);
+
+        // Escape key to close
+        window.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && authDrawer.classList.contains('active')) {
+            closeDrawer();
+          }
+        });
+
+        // Tab switching logic inside drawer
+        const tabBtns = document.querySelectorAll('.drawer-tab-btn');
+        const tabPanes = document.querySelectorAll('.drawer-tab-pane');
+
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const target = btn.dataset.tab;
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabPanes.forEach(p => p.classList.remove('active'));
+
+            btn.classList.add('active');
+            const activePane = document.getElementById(target);
+            if (activePane) activePane.classList.add('active');
+          });
+        });
+      }
+    });
+
+    // Toggle password visibility
+    function togglePw(id, el) {
+      const inp = document.getElementById(id);
+      if (inp) {
+        const hidden = inp.type === 'password';
+        inp.type = hidden ? 'text' : 'password';
+        el.querySelector('i').className = hidden ? 'fas fa-eye-slash' : 'fas fa-eye';
+      }
+    }
+
+    // Password strength for drawer register form
+    function updateDrawerStrength(val) {
+      const wrap  = document.getElementById('drawer-strength-wrap');
+      const fill  = document.getElementById('drawer-strength-fill');
+      const label = document.getElementById('drawer-strength-label');
+      if (!wrap || !fill || !label) return;
+      
+      wrap.style.display = val.length ? 'block' : 'none';
+
+      let score = 0;
+      if (val.length >= 6)             score++;
+      if (val.length >= 10)            score++;
+      if (/[A-Z]/.test(val))           score++;
+      if (/[0-9]/.test(val))           score++;
+      if (/[^A-Za-z0-9]/.test(val))    score++;
+
+      const levels = [
+        { w:'20%', bg:'#f87171', text:'Very weak'  },
+        { w:'40%', bg:'#fb923c', text:'Weak'        },
+        { w:'60%', bg:'#fbbf24', text:'Fair'        },
+        { w:'80%', bg:'#4ade80', text:'Strong'      },
+        { w:'100%',bg:'#22c55e', text:'Very strong' },
+      ];
+      const lvl = levels[Math.min(score, 4)];
+      fill.style.width      = lvl.w;
+      fill.style.background = lvl.bg;
+      label.textContent     = lvl.text;
+      label.style.color     = lvl.bg;
+    }
+  </script>
+
+  <script>
+    // ── Aura Support Bot logic
+    document.addEventListener('DOMContentLoaded', () => {
+      const fab = document.getElementById('support-fab');
+      const chatWindow = document.getElementById('support-chat-window');
+      const closeChat = document.getElementById('support-close');
+      const messagesContainer = document.getElementById('support-chat-messages');
+      const chatForm = document.getElementById('support-chat-form');
+      const chatInput = document.getElementById('support-chat-input');
+      const unreadBadge = fab ? fab.querySelector('.support-unread-badge') : null;
+
+      if (!fab || !chatWindow) return;
+
+      const toggleChat = () => {
+        chatWindow.classList.toggle('active');
+        if (chatWindow.classList.contains('active')) {
+          if (unreadBadge) unreadBadge.style.display = 'none';
+          // Scroll to bottom on open
+          setTimeout(() => {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+          }, 100);
+        }
+      };
+
+      fab.addEventListener('click', toggleChat);
+      if (closeChat) closeChat.addEventListener('click', toggleChat);
+
+      // Canned bot response database
+      const QA = [
+        {
+          keys: ['track', 'order', 'status', 'where', 'delivery status'],
+          response: "To track your order, please head to your **Profile** page (by clicking the user icon in the top right). Under the **Order History** section, you will find active shipments and tracking status. Delivery typically takes **3-5 business days**."
+        },
+        {
+          keys: ['price', 'cost', 'rupee', '₹', 'prices', 'inr'],
+          response: "All prices on Aura Store are listed in **Indian Rupees (₹)** and include applicable GST. Minimalist mechanical keyboards are priced at **₹6,999**, and premium desk pads are **₹1,499**. Free shipping applies on orders over **₹2,000**!"
+        },
+        {
+          keys: ['return', 'refund', 'exchange', 'policy', 'policies', 'warranty'],
+          response: "We offer a **7-day hassle-free return and exchange policy**. Items must be unused and in original packaging. Refunds are processed back to your original payment mode within **48 hours** of receiving the product."
+        },
+        {
+          keys: ['shipping', 'delivery', 'charges', 'courier', 'free'],
+          response: "We provide **free express shipping** all over India for orders above **₹2,000**! For orders under ₹2,000, standard shipping is **₹150**. Delivery takes **3 to 5 business days** depending on your pin code."
+        },
+        {
+          keys: ['contact', 'email', 'phone', 'hours', 'help', 'support'],
+          response: "Our customer service is open **Monday to Saturday, 9 AM to 6 PM IST**. You can email us anytime at **support@aurastore.in** or call us at **+91 98765 43210**."
+        },
+        {
+          keys: ['hi', 'hello', 'hey', 'greetings', 'yo'],
+          response: "Hello! Welcome to Aura Store Support. I am your **Aura Assistant**. How can I assist you today? Feel free to ask about orders, prices, or store policies."
+        }
+      ];
+
+      // Format current time as HH:MM
+      const getFormattedTime = () => {
+        const d = new Date();
+        let h = d.getHours();
+        let m = d.getMinutes();
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12;
+        h = h ? h : 12;
+        m = m < 10 ? '0'+m : m;
+        return `${h}:${m} ${ampm}`;
+      };
+
+      // Append bubble helper
+      const appendMessage = (sender, text, isHtml = false) => {
+        const bubble = document.createElement('div');
+        bubble.className = `chat-msg ${sender}`;
+        
+        let contentHtml = isHtml ? text : text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        bubble.innerHTML = `
+          ${contentHtml}
+          <span class="msg-meta">${getFormattedTime()}</span>
+        `;
+        messagesContainer.appendChild(bubble);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      };
+
+      // Show typing indicator
+      let typingIndicator = null;
+      const showTypingIndicator = () => {
+        if (typingIndicator) return;
+        typingIndicator = document.createElement('div');
+        typingIndicator.className = 'typing-indicator';
+        typingIndicator.innerHTML = `
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        `;
+        messagesContainer.appendChild(typingIndicator);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      };
+
+      const removeTypingIndicator = () => {
+        if (typingIndicator) {
+          typingIndicator.remove();
+          typingIndicator = null;
+        }
+      };
+
+      // Bot reply simulator
+      const getBotResponse = (userInput) => {
+        const input = userInput.toLowerCase();
+        for (const item of QA) {
+          for (const key of item.keys) {
+            if (input.includes(key)) {
+              return item.response;
+            }
+          }
+        }
+        return "I'm sorry, I didn't quite catch that. Could you please ask about **order tracking**, **product pricing (₹)**, or our **return policy**? You can also email us at **support@aurastore.in**.";
+      };
+
+      const handleUserMessage = (text) => {
+        appendMessage('user', text);
+        showTypingIndicator();
+
+        setTimeout(() => {
+          removeTypingIndicator();
+          const reply = getBotResponse(text);
+          appendMessage('bot', reply);
+        }, 800 + Math.random() * 600);
+      };
+
+      // Submit input
+      chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const val = chatInput.value.trim();
+        if (!val) return;
+        chatInput.value = '';
+        handleUserMessage(val);
+      });
+
+      // Quick replies clicking
+      messagesContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('quick-reply-btn')) {
+          const text = e.target.textContent;
+          // Find and hide/remove parent quick replies container
+          const qrContainer = e.target.closest('.quick-replies');
+          if (qrContainer) {
+            qrContainer.style.opacity = '0.5';
+            qrContainer.style.pointerEvents = 'none';
+          }
+          handleUserMessage(text);
+        }
+      });
+
+      // Welcome message with Quick Replies
+      appendMessage('bot', "Hi there! Welcome to **Aura Store**. How can I assist you today? Feel free to ask about order tracking, product pricing, or returns!");
+      
+      const repliesWrap = document.createElement('div');
+      repliesWrap.className = 'quick-replies';
+      repliesWrap.innerHTML = `
+        <button class="quick-reply-btn">Track Order</button>
+        <button class="quick-reply-btn">Product Pricing (₹)</button>
+        <button class="quick-reply-btn">Return Policy</button>
+        <button class="quick-reply-btn">Contact Support</button>
+      `;
+      messagesContainer.appendChild(repliesWrap);
+    });
+  </script>
+
+  {% block extra_js %}{% endblock %}
+
 </body>
 </html>

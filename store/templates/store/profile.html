@@ -1,0 +1,154 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}My Profile – Aura Store{% endblock %}
+
+{% block extra_css %}
+<style>
+.profile-page {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+}
+
+.profile-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 2.8rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  animation: cardIn .45s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes cardIn {
+  from { opacity:0; transform: translateY(24px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+.avatar {
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  border: 2px solid rgba(232,201,126,.3);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.25rem;
+  font-size: 2.2rem;
+  color: var(--accent);
+}
+
+.profile-card h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: .3rem; }
+.member-since { font-size: .8rem; color: var(--muted); margin-bottom: 2rem; }
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .85rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.info-block {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: .9rem 1rem;
+}
+.info-block label {
+  display: block;
+  font-size: .68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: .3rem;
+}
+.info-block p { font-size: .9rem; font-weight: 500; color: var(--text); margin: 0; word-break: break-all; }
+.mongo-id-val { font-size: .68rem !important; color: var(--text-secondary) !important; font-family: monospace; }
+
+.profile-actions { display: flex; flex-direction: column; gap: .8rem; }
+
+.btn-shop-action {
+  display: flex; align-items: center; justify-content: center; gap: .55rem;
+  height: 48px;
+  background: var(--accent); color: #0d0d0d;
+  border-radius: var(--r-md);
+  font-family: var(--font-head);
+  font-weight: 700; font-size: .92rem;
+  text-decoration: none;
+  transition: var(--fast);
+}
+.btn-shop-action:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-accent);
+}
+
+.btn-logout-action {
+  display: flex; align-items: center; justify-content: center; gap: .55rem;
+  height: 48px;
+  border: 1px solid rgba(248,113,113,.3);
+  color: var(--danger);
+  background: var(--danger-dim);
+  border-radius: var(--r-md);
+  font-family: var(--font-head);
+  font-weight: 600; font-size: .92rem;
+  text-decoration: none;
+  transition: var(--fast);
+}
+.btn-logout-action:hover {
+  background: rgba(248,113,113,.18);
+  border-color: var(--danger);
+  transform: translateY(-1px);
+}
+
+.mongo-badge {
+  display: flex; align-items: center; justify-content: center;
+  gap: .4rem; margin-top: 1.5rem; font-size: .72rem; color: var(--muted);
+}
+.mongo-leaf { color: #00ed64; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="profile-page">
+  <div class="profile-card">
+
+    <div class="avatar"><i class="fas fa-user"></i></div>
+    <h1>{{ mongo_user.username }}</h1>
+    <p class="member-since">Member since {{ mongo_user.created_at|date:"N j, Y" }}</p>
+
+    <div class="info-grid">
+      <div class="info-block">
+        <label><i class="fas fa-at"></i> Username</label>
+        <p>{{ mongo_user.username }}</p>
+      </div>
+      <div class="info-block">
+        <label><i class="fas fa-envelope"></i> Email</label>
+        <p>{{ mongo_user.email }}</p>
+      </div>
+      <div class="info-block" style="grid-column: span 2;">
+        <label><i class="fas fa-fingerprint"></i> MongoDB ID</label>
+        <p class="mongo-id-val">{{ mongo_user._id }}</p>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <a href="{% url 'store:product_list' %}" class="btn-shop-action">
+        <i class="fas fa-store"></i> Continue Shopping
+      </a>
+      <a href="{% url 'store:logout' %}" class="btn-logout-action">
+        <i class="fas fa-arrow-right-from-bracket"></i> Sign Out
+      </a>
+    </div>
+
+    <div class="mongo-badge">
+      <i class="fas fa-leaf mongo-leaf"></i> Account in MongoDB Atlas
+    </div>
+
+  </div>
+</section>
+{% endblock %}

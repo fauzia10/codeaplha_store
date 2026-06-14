@@ -1,104 +1,197 @@
 {% extends 'store/base.html' %}
 {% load static %}
 
-{% block title %}Shopping Cart - Aura Store{% endblock %}
+{% block title %}Your Cart – Aura Store{% endblock %}
 
 {% block content %}
 <div class="cart-page-container">
-    <h1 class="cart-page-title">Your Shopping Bag</h1>
+  <h1 class="cart-page-title">Your Shopping Bag</h1>
 
-    <div class="cart-layout" id="cart-content-wrapper">
-        {% if cart %}
-            <!-- Cart Items List -->
-            <div class="cart-items-panel">
-                {% for item in cart %}
-                    {% with product=item.product %}
-                        <div class="cart-item" data-product-id="{{ product.id }}" id="cart-item-{{ product.id }}">
-                            <div class="cart-item-image-col">
-                                {% if product.image %}
-                                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="cart-item-image">
-                                {% else %}
-                                    <div class="cart-item-image-placeholder">
-                                        <i class="fas fa-box-open"></i>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="cart-item-details-col">
-                                <h3 class="cart-item-title">
-                                    <a href="{% url 'store:product_detail' product.id %}">{{ product.name }}</a>
-                                </h3>
-                                <span class="cart-item-price">${{ item.price }}</span>
-                            </div>
+  <div class="cart-layout" id="cart-content-wrapper">
 
-                            <div class="cart-item-quantity-col">
-                                <div class="cart-qty-control">
-                                    <button class="cart-qty-btn cart-minus-btn" data-product-id="{{ product.id }}">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <input type="number" class="cart-qty-input" data-product-id="{{ product.id }}" value="{{ item.quantity }}" min="1" max="{{ product.stock }}" readonly>
-                                    <button class="cart-qty-btn cart-plus-btn" data-product-id="{{ product.id }}">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
+    {% if cart %}
 
-                            <div class="cart-item-subtotal-col">
-                                <span class="cart-item-subtotal" id="subtotal-{{ product.id }}">${{ item.total_price }}</span>
-                            </div>
+    <!-- ── Cart Items ─────────────────────────────────────────── -->
+    <div class="cart-items-panel" id="cart-items-panel">
+      {% for item in cart %}
+      {% with product=item.product %}
+      <div class="cart-item" data-product-id="{{ product.id }}" id="cart-item-{{ product.id }}">
 
-                            <div class="cart-item-remove-col">
-                                <button class="cart-remove-btn" data-product-id="{{ product.id }}">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                    {% endwith %}
-                {% endfor %}
+        <!-- Image -->
+        <div class="cart-item-image-col">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="cart-item-image">
+          {% else %}
+            <div class="cart-item-image-placeholder">
+              <i class="fas fa-box-open"></i>
             </div>
+          {% endif %}
+        </div>
 
-            <!-- Cart Summary Panel -->
-            <div class="cart-summary-panel">
-                <div class="summary-card">
-                    <h2>Order Summary</h2>
-                    <div class="summary-row">
-                        <span>Subtotal</span>
-                        <span id="cart-summary-subtotal">${{ cart.get_total_price }}</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Shipping</span>
-                        <span class="free-shipping">FREE</span>
-                    </div>
-                    <div class="summary-divider"></div>
-                    <div class="summary-row total-row">
-                        <span>Total</span>
-                        <span id="cart-summary-total">${{ cart.get_total_price }}</span>
-                    </div>
-                    <button class="btn btn-primary checkout-btn" onclick="alert('Order placed successfully! Thank you for shopping at Aura Store.')">
-                        Proceed to Checkout
-                    </button>
-                    <a href="{% url 'store:product_list' %}" class="continue-shopping">
-                        <i class="fas fa-arrow-left"></i> Continue Shopping
-                    </a>
-                </div>
-            </div>
-        {% else %}
-            <!-- Empty Cart -->
-            <div class="empty-cart-view" id="empty-cart-message">
-                <i class="fas fa-shopping-bag empty-icon"></i>
-                <h2>Your shopping bag is empty</h2>
-                <p>Add some high-quality workspace gear to elevate your day-to-day work.</p>
-                <a href="{% url 'store:product_list' %}" class="btn btn-primary">Go to Shop</a>
-            </div>
-        {% endif %}
+        <!-- Details -->
+        <div class="cart-item-details-col">
+          <h3 class="cart-item-title">
+            <a href="{% url 'store:product_detail' product.id %}">{{ product.name }}</a>
+          </h3>
+          <span class="cart-item-price">&#8377;{{ item.price|floatformat:0 }} each</span>
+        </div>
+
+        <!-- Quantity -->
+        <div class="cart-item-quantity-col">
+          <div class="cart-qty-control">
+            <button class="cart-qty-btn cart-minus-btn"
+                    data-product-id="{{ product.id }}"
+                    aria-label="Decrease quantity">
+              <i class="fas fa-minus"></i>
+            </button>
+            <input type="number" class="cart-qty-input"
+                   data-product-id="{{ product.id }}"
+                   value="{{ item.quantity }}" min="1"
+                   max="{{ product.stock }}" readonly>
+            <button class="cart-qty-btn cart-plus-btn"
+                    data-product-id="{{ product.id }}"
+                    aria-label="Increase quantity">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Subtotal -->
+        <div class="cart-item-subtotal-col">
+          <span class="cart-item-subtotal" id="subtotal-{{ product.id }}">
+            &#8377;{{ item.total_price|floatformat:0 }}
+          </span>
+        </div>
+
+        <!-- Remove -->
+        <div class="cart-item-remove-col">
+          <button class="cart-remove-btn"
+                  data-product-id="{{ product.id }}"
+                  aria-label="Remove {{ product.name }}">
+            <i class="fas fa-trash-can"></i>
+          </button>
+        </div>
+
+      </div>
+      {% endwith %}
+      {% endfor %}
     </div>
 
-    <!-- Hidden empty cart view placeholder to swap with JS if cart empty -->
-    <div class="empty-cart-view" id="empty-cart-placeholder" style="display: none;">
-        <i class="fas fa-shopping-bag empty-icon"></i>
-        <h2>Your shopping bag is empty</h2>
-        <p>Add some high-quality workspace gear to elevate your day-to-day work.</p>
-        <a href="{% url 'store:product_list' %}" class="btn btn-primary">Go to Shop</a>
+    <!-- ── Order Summary ──────────────────────────────────────── -->
+    <div class="cart-summary-panel">
+      <div class="summary-card">
+        <h2>Order Summary</h2>
+
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span id="cart-summary-subtotal">&#8377;{{ cart.get_total_price|floatformat:0 }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Shipping</span>
+          <span class="free-shipping">FREE</span>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="summary-row total-row">
+          <span>Total</span>
+          <span id="cart-summary-total">&#8377;{{ cart.get_total_price|floatformat:0 }}</span>
+        </div>
+
+        <button class="btn btn-primary checkout-btn"
+                id="checkout-btn"
+                onclick="openCheckoutModal()">
+          <i class="fas fa-lock"></i> Secure Checkout
+        </button>
+
+        <a href="{% url 'store:product_list' %}" class="continue-shopping">
+          <i class="fas fa-arrow-left"></i> Continue Shopping
+        </a>
+      </div>
     </div>
+
+    {% else %}
+
+    <!-- ── Empty Cart ─────────────────────────────────────────── -->
+    <div class="empty-cart-view" id="empty-cart-message">
+      <div class="empty-icon"><i class="fas fa-bag-shopping"></i></div>
+      <h2>Your bag is empty</h2>
+      <p>Add some high-quality workspace gear to elevate your day.</p>
+      <a href="{% url 'store:product_list' %}" class="btn btn-primary">
+        <i class="fas fa-store"></i> Go to Shop
+      </a>
+    </div>
+
+    {% endif %}
+  </div>
+
+  <!-- Hidden placeholder for JS empty state swap -->
+  <div class="empty-cart-view" id="empty-cart-placeholder" style="display:none;" aria-hidden="true">
+    <div class="empty-icon"><i class="fas fa-bag-shopping"></i></div>
+    <h2>Your bag is empty</h2>
+    <p>Add some high-quality workspace gear to elevate your day.</p>
+    <a href="{% url 'store:product_list' %}" class="btn btn-primary">
+      <i class="fas fa-store"></i> Go to Shop
+    </a>
+  </div>
+
 </div>
+
+<!-- ── Order Confirmation Modal ──────────────────────────────── -->
+<div class="checkout-modal-overlay" id="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="checkout-modal-card">
+    <div class="modal-success-icon">
+      <div class="success-ring"></div>
+      <i class="fas fa-check"></i>
+    </div>
+    <h2 id="modal-title">Order Confirmed!</h2>
+    <p class="modal-subtitle">Thank you for shopping at <strong>AuraStore</strong>. Your order has been placed and will be processed shortly.</p>
+
+    <div class="modal-order-details">
+      <div class="modal-order-row">
+        <span><i class="fas fa-box"></i> Order Status</span>
+        <span class="modal-status-badge"><i class="fas fa-circle-check"></i> Confirmed</span>
+      </div>
+      <div class="modal-order-row">
+        <span><i class="fas fa-truck"></i> Shipping</span>
+        <span>FREE · 3–5 business days</span>
+      </div>
+      <div class="modal-order-row">
+        <span><i class="fas fa-indian-rupee-sign"></i> Total Charged</span>
+        <span id="modal-total" class="modal-total-val">₹{{ cart.get_total_price|floatformat:0 }}</span>
+      </div>
+    </div>
+
+    <a href="{% url 'store:product_list' %}" class="btn btn-primary modal-shop-btn">
+      <i class="fas fa-store"></i> Continue Shopping
+    </a>
+  </div>
+</div>
+
 {% endblock %}
+
+{% block extra_js %}
+<script>
+  function openCheckoutModal() {
+    const modal = document.getElementById('checkout-modal');
+    if (!modal) return;
+    // Sync total from page
+    const totalEl = document.getElementById('cart-summary-total');
+    const modalTotal = document.getElementById('modal-total');
+    if (totalEl && modalTotal) {
+      modalTotal.textContent = totalEl.textContent;
+    }
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Close modal on overlay click
+  document.getElementById('checkout-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  });
+</script>
+{% endblock %}
+

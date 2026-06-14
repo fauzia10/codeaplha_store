@@ -1,80 +1,252 @@
 {% extends 'store/base.html' %}
 {% load static %}
 
-{% block title %}Shop - Aura Store{% endblock %}
+{% block title %}Shop – Aura Store{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Category Filter Bar ─────────────────────────────── */
+.category-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.2rem;
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+
+.cat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-right: 0.35rem;
+  flex-shrink: 0;
+}
+
+.cat-pill {
+  padding: 0.4rem 1rem;
+  border-radius: 50px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--fast);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.cat-pill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.cat-pill.active {
+  background: var(--accent);
+  color: #0d0d0d;
+  border-color: var(--accent);
+  font-weight: 700;
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+/* ── Product count badge ──────────────────────────────── */
+.product-count {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+/* ── No results in category ───────────────────────────── */
+.no-category-results {
+  display: none;
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 2rem;
+}
+.no-category-results.visible { display: block; }
+.no-category-results i { font-size: 2.5rem; color: var(--muted); margin-bottom: 1rem; }
+.no-category-results h3 { margin-bottom: 0.4rem; }
+.no-category-results p  { color: var(--text-secondary); font-size: 0.9rem; }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="shop-container">
-    <!-- Hero Banner -->
-    <header class="shop-hero">
-        <div class="hero-content">
-            <h1>Elevate Your Workspace</h1>
-            <p>Discover minimal, functional, and highly polished essentials designed for digital professionals.</p>
+
+  <!-- ── Hero ─────────────────────────────────────────── -->
+  <header class="shop-hero">
+    <div class="hero-content">
+      <h1>Elevate Your Workspace</h1>
+      <p>Discover minimal, functional and highly polished essentials
+         designed for digital professionals who value craft.</p>
+    </div>
+  </header>
+
+  <!-- ── Category Filter Bar ──────────────────────────── -->
+  {% if categories %}
+  <nav class="category-bar" id="category-bar" aria-label="Filter by category">
+    <span class="cat-label"><i class="fas fa-sliders"></i> Filter</span>
+
+    <button class="cat-pill active" data-category="all" id="cat-all">
+      All
+    </button>
+    {% for cat in categories %}
+    <button class="cat-pill" data-category="{{ cat }}" id="cat-{{ cat|lower|cut:' ' }}">
+      {{ cat }}
+    </button>
+    {% endfor %}
+
+    <span class="product-count" id="product-count">
+      {{ products|length }} items
+    </span>
+  </nav>
+  {% endif %}
+
+  <!-- ── Search Results Info ───────────────────────────── -->
+  {% if query %}
+  <div class="search-results-info">
+    <p>Results for: <strong>"{{ query }}"</strong></p>
+    <a href="{% url 'store:product_list' %}" class="clear-search-btn">
+      <i class="fas fa-xmark"></i> Clear
+    </a>
+  </div>
+  {% endif %}
+
+  <!-- ── Products ──────────────────────────────────────── -->
+  <section class="products-section" aria-label="Products">
+    {% if products %}
+    <div class="product-grid" id="product-grid">
+
+      {% for product in products %}
+      <article class="product-card"
+               id="product-card-{{ product.id }}"
+               data-category="{{ product.category }}">
+
+        <!-- Image -->
+        <div class="product-image-container">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                 class="product-image" loading="lazy">
+          {% else %}
+            <div class="product-image-placeholder">
+              <i class="fas fa-box-open"></i>
+            </div>
+          {% endif %}
+          <div class="product-card-overlay">
+            <a href="{% url 'store:product_detail' product.id %}" class="btn btn-secondary">
+              <i class="fas fa-eye"></i> View Details
+            </a>
+          </div>
+          <!-- Category tag on card -->
+          <span class="card-category-tag">{{ product.category }}</span>
         </div>
-    </header>
 
-    <!-- Products Section -->
-    <section class="products-section">
-        {% if query %}
-            <div class="search-results-info">
-                <p>Showing search results for: <strong>"{{ query }}"</strong></p>
-                <a href="{% url 'store:product_list' %}" class="clear-search-btn">Clear Search</a>
-            </div>
-        {% endif %}
+        <!-- Info -->
+        <div class="product-info">
+          <h3 class="product-title">
+            <a href="{% url 'store:product_detail' product.id %}">{{ product.name }}</a>
+          </h3>
+          <div class="product-meta">
+            <span class="product-price">&#8377;{{ product.price|floatformat:0 }}</span>
+            {% if product.stock > 0 %}
+              <span class="stock-badge in-stock">In Stock</span>
+            {% else %}
+              <span class="stock-badge out-of-stock">Sold Out</span>
+            {% endif %}
+          </div>
+          <div class="product-actions">
+            {% if product.stock > 0 %}
+              <button class="btn btn-primary add-to-cart-btn"
+                      id="add-btn-{{ product.id }}"
+                      data-product-id="{{ product.id }}">
+                <i class="fas fa-cart-plus"></i> Add to Cart
+              </button>
+            {% else %}
+              <button class="btn btn-primary" disabled>Sold Out</button>
+            {% endif %}
+          </div>
+        </div>
 
-        {% if products %}
-            <div class="product-grid">
-                {% for product in products %}
-                    <article class="product-card">
-                        <div class="product-image-container">
-                            {% if product.image %}
-                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
-                            {% else %}
-                                <div class="product-image-placeholder">
-                                    <i class="fas fa-box-open"></i>
-                                </div>
-                            {% endif %}
-                            <div class="product-card-overlay">
-                                <a href="{% url 'store:product_detail' product.id %}" class="btn btn-secondary">
-                                    View Details
-                                </a>
-                            </div>
-                        </div>
-                        <div class="product-info">
-                            <h3 class="product-title">
-                                <a href="{% url 'store:product_detail' product.id %}">{{ product.name }}</a>
-                            </h3>
-                            <div class="product-meta">
-                                <span class="product-price">${{ product.price }}</span>
-                                {% if product.stock > 0 %}
-                                    <span class="stock-badge in-stock">In Stock</span>
-                                {% else %}
-                                    <span class="stock-badge out-of-stock">Out of Stock</span>
-                                {% endif %}
-                            </div>
-                            <div class="product-actions">
-                                {% if product.stock > 0 %}
-                                    <button class="btn btn-primary add-to-cart-btn" data-product-id="{{ product.id }}">
-                                        <i class="fas fa-cart-plus"></i> Add to Cart
-                                    </button>
-                                {% else %}
-                                    <button class="btn btn-primary" disabled>
-                                        Sold Out
-                                    </button>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </article>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="no-products">
-                <i class="fas fa-search-minus"></i>
-                <h3>No products found</h3>
-                <p>Try searching for something else or browse all products.</p>
-                <a href="{% url 'store:product_list' %}" class="btn btn-primary">Browse All Products</a>
-            </div>
-        {% endif %}
-    </section>
+      </article>
+      {% endfor %}
+
+      <!-- No results placeholder (shown by JS) -->
+      <div class="no-category-results" id="no-cat-results">
+        <i class="fas fa-magnifying-glass"></i>
+        <h3>No items in this category</h3>
+        <p>Try another filter or browse all products.</p>
+      </div>
+
+    </div>
+
+    {% else %}
+    <div class="no-products">
+      <div class="empty-icon"><i class="fas fa-magnifying-glass"></i></div>
+      <h3>No products found</h3>
+      <p>Try a different search term, or browse everything we carry.</p>
+      <a href="{% url 'store:product_list' %}" class="btn btn-primary">Browse All Products</a>
+    </div>
+    {% endif %}
+  </section>
+
 </div>
+{% endblock %}
+
+
+
+{% block extra_js %}
+<script>
+(function () {
+  'use strict';
+
+  const pills   = document.querySelectorAll('.cat-pill');
+  const cards   = document.querySelectorAll('.product-card');
+  const counter = document.getElementById('product-count');
+  const noRes   = document.getElementById('no-cat-results');
+
+  if (!pills.length) return;
+
+  function filterBy(category) {
+    let visible = 0;
+
+    cards.forEach(function (card) {
+      const cardCat = card.dataset.category;
+      const show = (category === 'all' || cardCat === category);
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    // Update count badge
+    if (counter) {
+      counter.textContent = visible + (visible === 1 ? ' item' : ' items');
+    }
+
+    // Show/hide empty state
+    if (noRes) {
+      noRes.classList.toggle('visible', visible === 0);
+    }
+  }
+
+  pills.forEach(function (pill) {
+    pill.addEventListener('click', function () {
+      // Toggle active class
+      pills.forEach(function (p) { p.classList.remove('active'); });
+      pill.classList.add('active');
+
+      filterBy(pill.dataset.category);
+    });
+  });
+
+  // Initialise to "All" on load
+  filterBy('all');
+})();
+</script>
 {% endblock %}
