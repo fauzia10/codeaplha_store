@@ -3,11 +3,12 @@ MongoDB Authentication Utility
 Handles all user auth operations (register, login, logout) via MongoDB Atlas.
 """
 
+import os
 from pymongo import MongoClient
 from django.contrib.auth.hashers import make_password, check_password
 from datetime import datetime
 
-MONGO_URI = "mongodb+srv://fauziakhan7266_db_user:dopamine102712@cluster0.bkm1kgq.mongodb.net/?appName=Cluster0"
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://fauziakhan7266_db_user:dopamine102712@cluster0.bkm1kgq.mongodb.net/?appName=Cluster0")
 
 _client = None
 
