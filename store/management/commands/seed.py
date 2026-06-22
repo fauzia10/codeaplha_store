@@ -30,9 +30,20 @@ class Command(BaseCommand):
                 phone_number='9876543210',
                 address='456 Customer Street, Mumbai'
             )
-            self.stdout.write(self.style.SUCCESS('Customer "buyer" created (Password: buyer123)'))
+            self.stdout.write(self.style.SUCCESS('Customer "buyer" created in SQLite (Password: buyer123)'))
         else:
-            self.stdout.write('Customer "buyer" already exists.')
+            self.stdout.write('Customer "buyer" already exists in SQLite.')
+
+        # Register same customer in MongoDB for front-end customer auth
+        try:
+            from store.mongo_auth import register_user
+            mongo_result = register_user('buyer', 'buyer@aurastore.com', 'buyer123')
+            if mongo_result.get('success'):
+                self.stdout.write(self.style.SUCCESS('Customer "buyer" registered in MongoDB.'))
+            else:
+                self.stdout.write(f'MongoDB seeding: {mongo_result.get("error")}')
+        except Exception as e:
+            self.stdout.write(self.style.WARNING(f'Could not seed buyer in MongoDB: {e}'))
 
         # ── 3. Products ───────────────────────────────────────────
         products_data = [

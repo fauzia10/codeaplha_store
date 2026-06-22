@@ -134,8 +134,14 @@ STORAGES = {
     },
 }
 
-MEDIA_URL = '/media/'
+IMAGEKIT_URL_ENDPOINT = os.environ.get('IMAGEKIT_URL_ENDPOINT', 'https://ik.imagekit.io/fauziakhan10/')
+
 MEDIA_ROOT = BASE_DIR / 'media'
+if DEBUG:
+    MEDIA_URL = '/media/'
+else:
+    # In production, route all media files through your ImageKit endpoint
+    MEDIA_URL = f"{IMAGEKIT_URL_ENDPOINT.rstrip('/')}/media/"
 
 AUTH_USER_MODEL = 'store.User'
 
