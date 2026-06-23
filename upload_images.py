@@ -1,6 +1,5 @@
 import os
 import sys
-import getpass
 import requests
 
 PUBLIC_KEY = "public_Kk0Iqyw0BQmW0+Bq7C6CXnePPZ0="
@@ -12,8 +11,8 @@ print("=" * 60)
 print(f"URL Endpoint: {URL_ENDPOINT}")
 print(f"Public Key:   {PUBLIC_KEY}\n")
 
-# Prompt for private key securely
-private_key = getpass.getpass("Enter your ImageKit Private Key (starts with 'private_'): ").strip()
+# Use a standard input() so it can receive piped input safely in headless environments
+private_key = input("Enter your ImageKit Private Key (starts with 'private_'): ").strip()
 if not private_key.startswith("private_"):
     print("Error: The key must start with 'private_'. Please run the script again.")
     sys.exit(1)
