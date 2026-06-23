@@ -46,6 +46,9 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING(f'Could not seed buyer in MongoDB: {e}'))
 
         # ── 3. Products ───────────────────────────────────────────
+        self.stdout.write('Clearing existing products...')
+        Product.objects.all().delete()
+
         products_data = [
 
             # ── Electronics ────────────────────────────────────
